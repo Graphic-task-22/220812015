@@ -10,6 +10,11 @@ import CubicBezierCurve3 from './line/CubicBezierCurve3' // 引入贝塞尔曲�
 import CubicBezierCurve2 from './line/QuadraticBezierCurve'
 import curvePath from './line/curvePath'
 import moutain, { updatePosition } from './demo/moutain'
+import bufferG from './mesh/buffer'
+import lathe from './line/lathe'
+import tube from './mesh/tube'
+import shape from './mesh/shape'
+import tunnel, { tubepoints } from './demo/tunnel'
 
 
 
@@ -39,12 +44,26 @@ function init() {
   // //三维贝塞尔
   // scene.add(CubicBezierCurve3);
 
-  // //curvePath
+  // curvePath
   // scene.add(curvePath);
 
   //添加moutain js
-  scene.add(moutain);
-  
+  //scene.add(moutain);
+
+  //buffer.js 先构建一个平面从而构建立体图形
+  //scene.add(bufferG);
+
+  //lathe 车削缓冲体
+  //scene.add(lathe);
+
+  //管道缓冲体
+  //scene.add(tube);
+
+  //形状缓冲几何体
+  //scene.add(shape);
+
+  //tunnel
+  scene.add(tunnel);
 
   // 环境光
   ambientLight = new THREE.AmbientLight(0xffffff, 1);
@@ -86,6 +105,9 @@ window.onresize = function () {
   camera.updateProjectionMatrix();
 };
 
+
+
+
 // 初始化辅助工具
 function initHelper() {
   // 辅助坐标轴
@@ -104,17 +126,42 @@ function initHelper() {
   scene.add(gridHelper);
 }
 
+
+
 // 动画循环
-function animate() {
+// function animate() {
+//   requestAnimationFrame(animate);
+//   renderer.render(scene, camera);
+//   updatePosition();
+
+//以下是tunnel的动画，使得他在隧道里走
+let i=0;
+function animate(){
+  if(i<tubepoints.length-1){
+    const points=tubepoints[i];
+    camera.position.copy(points);
+    const nextPoint=tubepoints[i+1];  //nextpoint每次加一
+    camera.lookAt(nextPoint);         //摄像机永远看向nextpoint
+    i++
+  }else{
+    i=0;
+  }
+  renderer.render(scene,camera);
   requestAnimationFrame(animate);
-  renderer.render(scene, camera);
-  updatePosition();
-
-
-  // 立方体旋转
-  cube.rotation.x += 0.01;
-  cube.rotation.y += 0.01;
 }
+document.addEventListener('keydown',(e)=>{
+  if(e.code==='ArrowDown'){
+    i+=1;  
+  }
+});
+
+
+
+  // // 立方体旋转 cube.js里面
+  // cube.rotation.x += 0.01;
+  // cube.rotation.y += 0.01;
+
+// }
 
 // 初始化性能监控
 function initStats() {
@@ -135,6 +182,9 @@ initHelper();
 initStats();
 animate();
 
+
+
+//旁边的更改下拉框
 // 创建 GUI 实例
 const gui = new GUI();
 
