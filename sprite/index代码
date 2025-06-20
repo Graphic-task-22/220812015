@@ -1,0 +1,60 @@
+//导入
+import snow from './sprite/snow';
+import rain from './sprite/rain';
+
+//粒子系统
+//雪
+scene.add(snow);
+//雨
+scene.add(rain);
+// 初始状态
+let currentWeather = null;
+
+
+// GUI控制
+const weatherControls = {
+  toggleSnow: () => {
+    if (currentWeather === snow) {
+      scene.remove(snow);
+      currentWeather = null;
+    } else {
+      if (currentWeather) scene.remove(currentWeather);
+      snow.init();
+      scene.add(snow);
+      currentWeather = snow;
+    }
+  },
+  toggleRain: () => {
+    if (currentWeather === rain) {
+      scene.remove(rain);
+      currentWeather = null;
+    } else {
+      if (currentWeather) scene.remove(currentWeather);
+      rain.init();
+      scene.add(rain);
+      currentWeather = rain;
+    }
+  }
+};
+
+// 创建GUI
+const gui = new GUI();
+const weatherFolder = gui.addFolder('天气控制');
+weatherFolder.add(weatherControls, 'toggleSnow').name('下雪');
+weatherFolder.add(weatherControls, 'toggleRain').name('下雨');
+
+
+// 先创建渲染器
+const renderer = Renderer();
+// 使用渲染器的DOM元素创建相机和控制器
+const { camera, controls } = Camera(renderer.domElement);
+
+renderer.setAnimationLoop(animate);
+function animate() {
+  animateVehicles();
+  animatePlayer();
+
+// 更新天气效果（如果有的话）
+if (currentWeather) {
+  currentWeather.update();
+}
